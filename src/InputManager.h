@@ -3,6 +3,7 @@
 #include <string>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 class InputManager {
 public:
@@ -17,10 +18,19 @@ public:
 		InputManager::getSelf()->key_callback(key, scancode, action, mode);
 	}
 
+	static void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+        InputManager::getSelf()->mouseUpdate(xpos, ypos);
+    }
+
 	void key_callback(int key, int scancode, int action, int mode) {
 		if (key<0 || key>(sizeof(pressingKeys) / sizeof(pressingKeys[0])))
 			return;
 		pressingKeys[key] = action != GLFW_RELEASE;
+	}
+
+	void mouseUpdate(double xpos, double ypos){
+		lastMousePosition.x  = (float) xpos;
+		lastMousePosition.y  = (float) ypos;
 	}
 
 	bool isKeyBeingHoldDown(int key) {
@@ -39,10 +49,15 @@ public:
 		return false;
 	}
 
+	glm::vec2 getMousePosition(){
+		return lastMousePosition;
+	}
+
 private:
 	InputManager();
 	static InputManager *self;
 	bool pressingKeys[512] = {false};
+	glm::vec2 lastMousePosition;
 	
 	void init() {
 		keyMapping.insert({ "MOVE_FORWARD", {KeyHolding, GLFW_KEY_W} });

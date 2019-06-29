@@ -43,6 +43,7 @@ public:
 			return textures2D.at(name);
 
 		int width, height, channels;
+		stbi_set_flip_vertically_on_load(true);
 		unsigned char *data = stbi_load( (RESOURCES_DIR+path).c_str(), &width, &height, &channels, STBI_rgb_alpha);
 		Texture2D tex;
 		tex.generateWithData(width, height, 4, data);

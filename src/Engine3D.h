@@ -13,7 +13,7 @@
 #include <iostream>
 
 
-class Engine3D{
+class Engine3D{	
 	public:
 		GameStateManager GSM;
 		Engine3D();
@@ -32,13 +32,16 @@ class Engine3D{
 		GLFWwindow *window;
 
 		Renderer renderer;
-		std::string currentShader = "cloudscape";
+		std::string currentShader = "yac";
+		// std::string currentShader = "cloudscape";
 		CloudSystem cloudSystem;
 		Camera camera;
 		glm::mat4 staticCam;
+		// static glm::vec2 lastMousePosition;
 
 		void initInputManager() {
 			glfwSetKeyCallback(window, InputManager::key_callback_handler);
+			glfwSetCursorPosCallback(window, InputManager::mouse_callback);
 
 			//Instantiate and init self
 			InputManager::getSelf();
@@ -151,7 +154,7 @@ class Engine3D{
 			glActiveTexture(GL_TEXTURE2);
 			cloudSystem.curl3.bind();
 
-			ResourceManager::getSelf()->getShader(currentShader).setInteger("weather", 3);
+			ResourceManager::getSelf()->getShader(currentShader).setInteger("iChannel0", 3);
 			glActiveTexture(GL_TEXTURE3);
 			ResourceManager::getSelf()->getTexture2D("weather").bind();
 
@@ -159,20 +162,21 @@ class Engine3D{
 
 			glm::vec3 camPos = *(camera.getPosition());
 
-			ResourceManager::getSelf()->getShader(currentShader).setFloat("time", time);
-			ResourceManager::getSelf()->getShader(currentShader).setMat4("cam", *camera.getCam());
+			ResourceManager::getSelf()->getShader(currentShader).setFloat("iTime", glfwGetTime());
+			// ResourceManager::getSelf()->getShader(currentShader).setMat4("cam", *camera.getCam());
 			//ResourceManager::getSelf()->getShader(currentShader).setMat4("staticCam", staticCam);
 			glm::mat4 invCam = glm::inverse(*camera.getCam());
 			//ResourceManager::getSelf()->getShader(currentShader).setMat4("inverseCam", invCam);
-			ResourceManager::getSelf()->getShader(currentShader).setMat4("model", model);
-			ResourceManager::getSelf()->getShader(currentShader).setMat4("projection", proj);
+			// ResourceManager::getSelf()->getShader(currentShader).setMat4("model", model);
+			// ResourceManager::getSelf()->getShader(currentShader).setMat4("projection", proj);
 			glm::mat4 invProj = glm::inverse(proj);
 			//ResourceManager::getSelf()->getShader(currentShader).setMat4("inverseProj", invProj);
-			ResourceManager::getSelf()->getShader(currentShader).setVec2("screenRes", WIDTH, HEIGHT);
-			ResourceManager::getSelf()->getShader(currentShader).setVec3("sunlightDirection", 0,1,0);
-			ResourceManager::getSelf()->getShader(currentShader).setVec3("cameraPosition", camPos.x, camPos.y, camPos.z);
+			ResourceManager::getSelf()->getShader(currentShader).setVec2("iResolution", WIDTH, HEIGHT);
+			// ResourceManager::getSelf()->getShader(currentShader).setVec3("sunlightDirection", 0,1,0);
+			// ResourceManager::getSelf()->getShader(currentShader).setVec3("cameraPosition", camPos.x, camPos.y, camPos.z);
+			ResourceManager::getSelf()->getShader(currentShader).setVec2("mousePosition", InputManager::getSelf()->getMousePosition().x, InputManager::getSelf()->getMousePosition().y);
 			
-			renderer.render(ResourceManager::getSelf()->getModel("cubeTest"));
+			renderer.render(ResourceManager::getSelf()->getModel("quadTest"));
 
 			/*model = glm::mat4(1);
 			model = glm::translate(model, { 0, 0, 8 });

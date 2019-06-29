@@ -7,34 +7,33 @@
 
 void generateTestModel(){
 	float vertices[] = {
-		-1, -1, 0,
-		1, -1, 0,
-		1, 1, 0,
+		-1.f,  1.f,
+		 1.f,  1.f,
+		-1.f, -1.f,
 
-		-1, -1, 0,
-		1, 1, 0,
-		-1, 1, 0
+		-1.f, -1.f,
+		 1.f,  1.f,
+		 1.f, -1.f
 	};
 
 	float texcoords[] = {
-		0, 1,
-		1, 1,
-		1, 0,
+		0.0f, 1.0f,
+		1.0f, 1.0f,
+		0.0f, 0.0f,
 
-		0, 1,
-		1, 0,
-		0, 0
+		0.0f, 0.0f,
+		1.0f, 1.0f,
+		1.0f, 0.0f
 	};
 
 	std::vector<GLfloat> *values = new std::vector<GLfloat>();
 	std::vector<int> *layout = new std::vector<int>();
-	(*layout).push_back(3);
+	(*layout).push_back(2);
 	(*layout).push_back(2);
 
 	for (int i = 0; i < 6; i++) {
-		(*values).push_back(vertices[(i * 3)]);
-		(*values).push_back(vertices[(i * 3) + 1]);
-		(*values).push_back(vertices[(i * 3) + 2]);
+		(*values).push_back(vertices[(i * 2)]);
+		(*values).push_back(vertices[(i * 2) + 1]);
 		(*values).push_back(texcoords[(i * 2)]);
 		(*values).push_back(texcoords[(i * 2) + 1]);
 	}
@@ -160,8 +159,9 @@ int main(){
 	GameStateManager gsm;
 	ResourceManager::getSelf()->loadShader("monocolor", "shaders/monoColor.vert", "shaders/monoColor.frag", "");
 	ResourceManager::getSelf()->loadShader("cloudscape", "shaders/cloudscape.vert", "shaders/cloudscape.frag", "");
+	ResourceManager::getSelf()->loadShader("yac", "shaders/yac.vert", "shaders/yac.frag", "");
 	ResourceManager::getSelf()->loadTexture2D("cloudheights", "imgs/heights.png");
-	ResourceManager::getSelf()->loadTexture2D("weather", "imgs/weather.png");
+	ResourceManager::getSelf()->loadTexture2D("weather", "imgs/iChannel0.png");
 
 	generateCubeTestModel();
 	generateTestModel();

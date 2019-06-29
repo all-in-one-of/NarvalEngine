@@ -105,10 +105,11 @@ public:
 	}
 
 	void setMat4(std::string name, glm::mat4 mat) {
-		if (glGetUniformLocation(id, name.c_str()) == -1) {
-			std::cout << "ERROR: uniform " + name + " not found";
-			exit(1);
-		}
+		// This is triggering even when uniform is defined but unused
+		// if (glGetUniformLocation(id, name.c_str()) == -1) {
+			// std::cout << "ERROR: uniform " + name + " not found";
+			// exit(1);
+		// }
 
 		glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 	}
