@@ -19,7 +19,7 @@ uniform sampler2D iChannel0;
 
 #define cameraMode 2 					//1 is free rotation, 2 is still camera but free sun rotation
 
-#define cloudSpeed 0.02
+#define cloudSpeed 0.3
 #define cloudHeight 1600.0
 #define cloudThickness 500.0
 #define cloudDensity 0.03

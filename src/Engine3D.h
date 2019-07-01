@@ -8,6 +8,9 @@
 #include "Camera.h"
 #include "CloudSystem.h"
 #include "Texture3D.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -24,11 +27,13 @@ class Engine3D{
 		double previousRenderTime;
 		int UPSCount = 0;
 		int FPSCount = 0;
+		int aUPS = 0;
+		int aFPS = 0;
 
 		int const GL_CONTEXT_VERSION_MAJOR = 4;
 		int const GL_CONTEXT_VERSION_MINOR = 0;
 		int const IS_VSYNC_ON = 0;
-		GLint WIDTH = 512, HEIGHT = 512;
+		GLint WIDTH = 104 * 16, HEIGHT = 104 * 9;
 		GLFWwindow *window;
 
 		Renderer renderer;
@@ -38,6 +43,12 @@ class Engine3D{
 		Camera camera;
 		glm::mat4 staticCam;
 		// static glm::vec2 lastMousePosition;
+
+
+		//Imgui vars
+		bool showMainMenu = true;
+		bool *p_open = &showMainMenu;
+    	ImGuiWindowFlags window_flags = 0;
 
 		void initInputManager() {
 			glfwSetKeyCallback(window, InputManager::key_callback_handler);
@@ -56,6 +67,21 @@ class Engine3D{
 			staticCam = glm::lookAt(position, position + front, up);
 		}
 
+		void initImgui(){
+			// Setup Dear ImGui binding
+			IMGUI_CHECKVERSION();
+			ImGui::CreateContext();
+			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+			//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+
+			ImGui_ImplGlfw_InitForOpenGL(window, true);
+			ImGui_ImplOpenGL3_Init();
+
+			// Setup style
+			ImGui::StyleColorsDark();
+		}
+
 		void init() {
 			startGLFW();
 			initInputManager();
@@ -67,6 +93,8 @@ class Engine3D{
 			//glEnable(GL_CULL_FACE);
 			//glCullFace(GL_BACK);
 			glEnable(GL_DEPTH_TEST);
+
+			initImgui();
 		}
 
 		int startGLFW() {
@@ -96,13 +124,21 @@ class Engine3D{
 			glfwSwapInterval(IS_VSYNC_ON);
 		}
 
+		void imguiShutdown(){
+			ImGui_ImplOpenGL3_Shutdown();
+			ImGui_ImplGlfw_Shutdown();
+			ImGui::DestroyContext();
+		}
+
 		void mainLoop() {
 			while (!glfwWindowShouldClose(window)) {
 
 				if (glfwGetTime() - startTime >= 1.0) {
-					std::cout << "------------------------" << std::endl;
-					std::cout << "UPS: " << UPSCount << std::endl;
-					std::cout << "FPS: " << FPSCount << std::endl;
+					// std::cout << "------------------------" << std::endl;
+					// std::cout << "UPS: " << UPSCount << std::endl;
+					// std::cout << "FPS: " << FPSCount << std::endl;
+					aUPS = UPSCount;
+					aFPS = FPSCount;
 					startTime = glfwGetTime();
 					UPSCount = 0;
 					FPSCount = 0;
@@ -111,6 +147,12 @@ class Engine3D{
 				update();
 				render();
 			}
+			imguiShutdown();
+
+			// glfw: terminate, clearing all previously allocated GLFW resources.
+			glfwDestroyWindow(window);
+			glfwTerminate();
+			// To-do: It is necessary to delete the data, we do not have a garbage collector here
 		}
 
 		void update() {
@@ -123,6 +165,27 @@ class Engine3D{
 				UPSCount++;
 			}
 			glfwPollEvents();
+		}
+
+		void renderImGUI(){
+			// Show GUI
+			// Start the ImGui frame (For Each new frame)
+        	ImGui_ImplOpenGL3_NewFrame();
+        	ImGui_ImplGlfw_NewFrame();
+        	ImGui::NewFrame();
+			
+			
+			if (showMainMenu){
+        		ImGui::SetNextWindowPos(ImVec2(1200, 4), ImGuiCond_Once); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
+        		ImGui::SetNextWindowSize(ImVec2(450, 900), ImGuiCond_Once);
+            	ImGui::Begin("Main Menu", p_open, window_flags);
+				ImGui::BulletText("UPS: %d", aUPS);
+				ImGui::BulletText("FPS: %d", aFPS);
+				ImGui::End();
+			}
+			// Imgui Render Calls (For Each end frame)
+        	ImGui::Render();
+        	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
 
 		void render() {
@@ -187,6 +250,7 @@ class Engine3D{
 			previousRenderTime = glfwGetTime();
 			GSM.render();
 			FPSCount++;
+			renderImGUI();
 			glfwSwapBuffers(window);
 		}
 };
